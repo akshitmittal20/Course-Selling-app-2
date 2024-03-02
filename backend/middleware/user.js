@@ -1,4 +1,5 @@
 const {JWT_SECRET} = require("../config")
+const jwt = require("jsonwebtoken")
 
 
 function userMiddleware(req,res,next){
@@ -7,7 +8,9 @@ function userMiddleware(req,res,next){
     const jwtToken = words[1]   //take the 1st array 
     const decodedValue = jwt.verify(jwtToken, JWT_SECRET)
     //authentication is what we are doinf here. For authorizaation , in the if statemenet , we would have also checked if the decodedValue.type=="user"... to chek if the user us admin or user
+
     if(decodedValue.username){
+        req.username = decodedValue.username;
         next();
     }
     else{

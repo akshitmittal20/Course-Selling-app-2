@@ -25,7 +25,7 @@ function adminMiddleware(req,res,next){
     }
     catch(e){
         res.json({
-            msg:"errro in jwt token process"
+            msg:"error in jwt token process"
         })
     }
     

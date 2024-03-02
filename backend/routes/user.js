@@ -3,7 +3,9 @@ mongoose.connect("mongodb+srv://akshitmittal20:pSD9tpjvHdOlEVax@290224.dl6gadx.m
 const express = require("express");
 const userMiddleware = require("../middleware/user");
 const { user, course } = require("../db");
+const { JWT_SECRET } = require("../config");
 const router = express.Router();
+const jwt = require("jsonwebtoken")
 
 router.post(('/signup'), (req, res)=>{
     //add user signup logic here 
@@ -19,6 +21,32 @@ router.post(('/signup'), (req, res)=>{
     })
 })
 
+router.post(('/signin'), async (req, res)=>{
+    //Logs in a user account.
+    console.log(JWT_SECRET)
+    const username = req.body.username;
+    const password = req.body.password;
+
+    const myUser = await user.find({
+        username,
+        password
+    })
+
+    if(myUser){
+        const token = jwt.sign({
+            username
+        }, JWT_SECRET)
+        res.json({
+            token
+        })
+    }
+    else{
+        res.status(403).json({
+            msg:"wrong username and password"
+        })
+    }
+})
+
 router.get(('/courses'), async(req,res)=>{
     //implement listing all the courses logic here
 
@@ -30,7 +58,8 @@ router.post(('/courses/:courseId'), userMiddleware, async (req,res)=>{
     //implement course purchase logic here
 
     const courseId = req.params.courseId        //extract value from a url like this
-    const username = req.headers.username;
+    const username = req.username;
+    console.log(username)
     //zod can be added here
     try {await user.updateOne({        // in this update one funcion, the 1st qrgument is the filter on whcih we want to update the value, adn the 2nd argument is the updateing parameter whic we want to update
         username: username
